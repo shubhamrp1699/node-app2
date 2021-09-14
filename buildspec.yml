@@ -7,23 +7,23 @@ phases:
       - echo Logging in to Amazon ECR...
       - aws --version
       - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=893922686986.dkr.ecr.ap-south-1.amazonaws.com/devops
+      - REPOSITORY_URI=893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_ID | awk -F":" '{print $2}')
   build:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...
-      - docker build -t 893922686986.dkr.ecr.ap-south-1.amazonaws.com/devops:latest .
-      - docker tag $REPOSITORY_URI:latest $REPOSITORY_URI:$IMAGE_TAG
+      - docker build -t 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:latest .
+      - docker tag 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:latest 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:$IMAGE_TAG
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker images...
-      - docker push $REPOSITORY_URI:latest .
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - docker push 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:latest .
+      - docker push 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:$IMAGE_TAG
       - echo Writing image definitions file...
-      - printf '[{"name":"nodeapp","imageUri":"%s"}]' $REPOSITORY_URI:$IMAGE_TAG > imagedefinitions.json
+      - printf '[{"name":"nodeapp","imageUri":"%s"}]' 893922686986.dkr.ecr.ap-south-1.amazonaws.com/node-app:$IMAGE_TAG > imagedefinitions.json
       - cat imagedefinitions.json 
 artifacts:
     files: imagedefinitions.json
